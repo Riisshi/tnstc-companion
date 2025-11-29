@@ -15,6 +15,7 @@ app.use(express.json());
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
+app.use("/api/refunds", require("./routes/refundRoutes"));
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -36,5 +37,8 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.use("/api/refunds", require("./routes/refundRoutes"));
+
 
 module.exports = app;

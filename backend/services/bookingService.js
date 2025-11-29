@@ -2,18 +2,11 @@ const Booking = require("../models/Booking");
 
 const bookingService = {
   createBooking: async (bookingData) => {
-    const {
-      userId,
-      busName,
-      from,
-      to,
-      date,
-      seat,
-      paymentId,
-      amount
-    } = bookingData;
+    console.log("SERVICE BOOKING DATA:", bookingData);
 
-    // Validate required fields
+    const { userId, busName, from, to, date, seat, paymentId, amount } =
+      bookingData;
+
     if (!userId || !busName || !from || !to || !date || !seat || !amount) {
       throw new Error("Missing required booking fields");
     }
@@ -26,7 +19,7 @@ const bookingService = {
       date,
       seat,
       paymentId,
-      amount
+      amount,
     });
 
     await booking.save();
@@ -34,17 +27,15 @@ const bookingService = {
   },
 
   getUserBookings: async (userId) => {
-    const bookings = await Booking.find({ userId })
+    return await Booking.find({ userId })
       .sort({ createdAt: -1 })
-      .select('-__v');
-    
-    return bookings;
+      .select("-__v");
   },
 
   getBookingById: async (bookingId, userId) => {
     const booking = await Booking.findOne({
       _id: bookingId,
-      userId
+      userId,
     });
 
     if (!booking) {
@@ -55,13 +46,34 @@ const bookingService = {
   },
 
   getAllBookings: async () => {
-    const bookings = await Booking.find()
+    return await Booking.find()
       .sort({ createdAt: -1 })
-      .populate('userId', 'name email')
-      .select('-__v');
-    
-    return bookings;
-  }
+      .populate("userId", "name email")
+      .select("-__v");
+  },
+
+  cancelBooking: async (bookingId, userId) => {
+    const booking = await Booking.findOne({ _id: bookingId, userId });
+
+    if (!booking) {
+      throw new Error("Booking not found or does not belong to this user");
+    }
+
+    if (booking.status === "cancelled") {
+      throw new Error("This booking is already cancelled");
+    }
+
+    const travelDate = new Date(booking.date);
+    const today = new Date();
+    if (travelDate < today) {
+      throw new Error("Cannot cancel past bookings");
+    }
+
+    booking.status = "cancelled";
+    await booking.save();
+
+    return booking;
+  },
 };
 
 module.exports = bookingService;
