@@ -1,14 +1,27 @@
-import { useEffect } from "react";
-import axios from "axios";
+import { Routes, Route, Link } from "react-router-dom";
+import "./App.css";
+import Home from "./pages/Home.jsx";
+import Search from "./pages/Search.jsx";
+import Seats from "./pages/Seats.jsx";
+import History from "./pages/History.jsx";
+import Confirmation from "./pages/Confirmation.jsx";
 
 export default function App() {
-  useEffect(() => {
-    axios.get("http://localhost:4000/api/test")
-      .then(res => console.log("Backend Response:", res.data))
-      .catch(err => console.error("Error:", err));
-  }, []);
-
   return (
-    <h1>TNSTC Companion – Prototype Build 0.1</h1>
+    <>
+      <nav style={{ display: "flex", gap: "20px", margin: "20px" }}>
+        <Link to="/">Home</Link>
+        <Link to="/search">Search Buses</Link>
+        <Link to="/history">Booking History</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/seats" element={<Seats />} />
+        <Route path="/confirmation" element={<Confirmation />} />
+        <Route path="/history" element={<History />} />
+      </Routes>
+    </>
   );
 }
