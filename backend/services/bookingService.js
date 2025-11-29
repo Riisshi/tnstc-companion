@@ -1,9 +1,8 @@
 const Booking = require("../models/Booking");
+const refundService = require("./refundService");
 
 const bookingService = {
   createBooking: async (bookingData) => {
-    console.log("SERVICE BOOKING DATA:", bookingData);
-
     const { userId, busName, from, to, date, seat, paymentId, amount } =
       bookingData;
 
@@ -38,10 +37,7 @@ const bookingService = {
       userId,
     });
 
-    if (!booking) {
-      throw new Error("Booking not found");
-    }
-
+    if (!booking) throw new Error("Booking not found");
     return booking;
   },
 
@@ -55,25 +51,30 @@ const bookingService = {
   cancelBooking: async (bookingId, userId) => {
     const booking = await Booking.findOne({ _id: bookingId, userId });
 
-    if (!booking) {
-      throw new Error("Booking not found or does not belong to this user");
-    }
+    if (!booking) throw new Error("Booking not found or unauthorized");
 
     if (booking.status === "cancelled") {
-      throw new Error("This booking is already cancelled");
+      throw new Error("Booking is already cancelled");
     }
 
     const travelDate = new Date(booking.date);
     const today = new Date();
-    if (travelDate < today) {
-      throw new Error("Cannot cancel past bookings");
-    }
+    if (travelDate < today) throw new Error("Cannot cancel past bookings");
 
+    // Cancel booking
     booking.status = "cancelled";
+    booking.refundInitiated = true;
     await booking.save();
 
-    return booking;
-  },
+    // Create refund entry
+    const refund = await refundService.createRefundForBooking(booking, {
+      status: "pending",
+      reason: "User cancelled booking"
+    });
+
+    return { booking, refund };
+  }
 };
 
 module.exports = bookingService;
+

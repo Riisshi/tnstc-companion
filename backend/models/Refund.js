@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
 const refundSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
   bookingId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Booking",
+    required: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   pnr: {
@@ -19,18 +19,20 @@ const refundSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  reason: {
+    type: String
+  },
   status: {
     type: String,
-    enum: ["pending", "processed", "rejected"],
+    enum: ["pending", "processed", "failed"],
     default: "pending"
-  },
-  requestedAt: {
-    type: Date,
-    default: Date.now
   },
   processedAt: {
     type: Date
   }
-});
+}, { timestamps: true });
+
+refundSchema.index({ bookingId: 1 });
 
 module.exports = mongoose.model("Refund", refundSchema);
+ 

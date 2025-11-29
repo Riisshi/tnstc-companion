@@ -3,9 +3,6 @@ const bookingService = require("../services/bookingService");
 const bookingController = {
   createBooking: async (req, res) => {
     try {
-      console.log("REQ.USER:", req.user);
-      console.log("REQ.BODY:", req.body);
-
       const bookingData = {
         ...req.body,
         userId: req.user.id
@@ -20,7 +17,6 @@ const bookingController = {
       });
 
     } catch (error) {
-      console.error("Booking creation error:", error);
       res.status(500).json({
         success: false,
         error: error.message
@@ -33,13 +29,9 @@ const bookingController = {
       const userId = req.user.id;
       const bookings = await bookingService.getUserBookings(userId);
 
-      res.json({
-        success: true,
-        data: bookings
-      });
+      res.json({ success: true, data: bookings });
 
     } catch (error) {
-      console.error("Fetching bookings error:", error);
       res.status(500).json({
         success: false,
         error: error.message
@@ -54,10 +46,7 @@ const bookingController = {
 
       const booking = await bookingService.getBookingById(id, userId);
 
-      res.json({
-        success: true,
-        data: booking
-      });
+      res.json({ success: true, data: booking });
 
     } catch (error) {
       res.status(404).json({
@@ -70,11 +59,7 @@ const bookingController = {
   getAllBookings: async (req, res) => {
     try {
       const bookings = await bookingService.getAllBookings();
-
-      res.json({
-        success: true,
-        data: bookings
-      });
+      res.json({ success: true, data: bookings });
 
     } catch (error) {
       res.status(500).json({
@@ -89,12 +74,12 @@ const bookingController = {
       const { id } = req.params;
       const userId = req.user.id;
 
-      const booking = await bookingService.cancelBooking(id, userId);
+      const result = await bookingService.cancelBooking(id, userId);
 
       res.json({
         success: true,
-        message: "Booking cancelled successfully",
-        data: booking
+        message: "Booking cancelled. Refund initiated.",
+        data: result
       });
 
     } catch (error) {
@@ -107,3 +92,4 @@ const bookingController = {
 };
 
 module.exports = bookingController;
+
