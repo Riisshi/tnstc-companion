@@ -13,7 +13,7 @@ export default function RefundTracker() {
     const fetchRefunds = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:4000/api/refunds/my-refunds",
+          "http://localhost:4000/api/refunds/",
           { headers: getAuthHeaders() }
         );
 

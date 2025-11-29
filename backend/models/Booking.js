@@ -47,21 +47,24 @@ const bookingSchema = new mongoose.Schema({
   pnr: {
     type: String,
     unique: true,
-    default: function() {
+    default: function () {
       return "PNR" + Math.random().toString(36).substr(2, 9).toUpperCase();
     }
+  },
+  refundInitiated: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
 });
 
-// Index for better query performance
 bookingSchema.index({ userId: 1, createdAt: -1 });
 bookingSchema.index({ pnr: 1 });
 
-// Virtual for formatted date (optional)
-bookingSchema.virtual('formattedDate').get(function() {
+bookingSchema.virtual('formattedDate').get(function () {
   return new Date(this.date).toLocaleDateString('en-IN');
 });
 
 module.exports = mongoose.model("Booking", bookingSchema);
+

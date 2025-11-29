@@ -1,24 +1,38 @@
-const Refund = require("../models/Refund");
+const refundService = require("../services/refundService");
 
 const refundController = {
+  getRefundStatus: async (req, res) => {
+    try {
+      const { pnr } = req.params;
+      const userId = req.user.id;
+
+      const data = await refundService.getRefundStatusByPNR(pnr, userId);
+
+      res.json({ success: true, data });
+
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  },
+
   getMyRefunds: async (req, res) => {
     try {
-      const refunds = await Refund.find({ userId: req.user.id })
-        .sort({ requestedAt: -1 })
-        .select("-__v");
+      const userId = req.user.id;
+      const refunds = await refundService.getUserRefunds(userId);
 
-      res.json({
-        success: true,
-        data: refunds
-      });
+      res.json({ success: true, data: refunds });
 
-    } catch (err) {
+    } catch (error) {
       res.status(500).json({
         success: false,
-        error: err.message
+        error: error.message
       });
     }
   }
 };
 
 module.exports = refundController;
+
