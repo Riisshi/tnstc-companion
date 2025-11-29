@@ -20,8 +20,9 @@ export default function Seats() {
   };
 
   const handleProceed = () => {
-    if (!selectedSeat) {
-      alert("Select a seat first");
+    if (!localStorage.getItem("token")) {
+      alert("Login required to book a seat");
+      navigate("/login");
       return;
     }
 
@@ -35,6 +36,7 @@ export default function Seats() {
       }
     });
   };
+
 
   return (
     <div style={{ padding: "20px" }}>

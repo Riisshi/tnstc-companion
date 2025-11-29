@@ -20,10 +20,36 @@ export default function Confirmation() {
       description: "Test Ticket Payment",
       order_id: orderRes.data.id,
 
-      handler: function (response) {
-        alert(
-          "Payment Successful!\nPayment ID: " + response.razorpay_payment_id
-        );
+      handler: async function (response) {
+      // Save booking locally
+        const newBooking = {
+          id: Date.now(),
+          busName: bus.name,
+          from,
+          to,
+          date,
+          seat,
+          paymentId: response.razorpay_payment_id
+        };
+
+        const existing = JSON.parse(localStorage.getItem("bookings")) || [];
+        existing.push(newBooking);
+
+        localStorage.setItem("bookings", JSON.stringify(existing));
+
+        alert("Payment Successful! Booking saved.");
+
+        await axios.post("http://localhost:4000/booking/save", {
+        busName: bus.name,
+        from,
+        to,
+        date,
+        seat,
+        paymentId: response.razorpay_payment_id,
+        amount: 200
+      });
+
+
       },
 
       prefill: {

@@ -1,37 +1,40 @@
 const express = require("express");
-const cors = require("cors"); // Add this line
+const cors = require("cors");
 const app = express();
-
 require("dotenv").config();
 
-app.use(cors()); // Add this line
+// Database connection
+const connectDB = require("./config/db");
+connectDB();
+
+// Middlewares
+app.use(cors());
 app.use(express.json());
 
-const crypto = require("crypto");
-const Razorpay = require("razorpay");
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/bookings", require("./routes/bookingRoutes"));
+app.use("/api/payments", require("./routes/paymentRoutes"));
 
-const razorpay = new Razorpay({
-  key_id: process.env.KEY_ID,
-  key_secret: process.env.KEY_SECRET,
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "Server is running", timestamp: new Date().toISOString() });
 });
 
-app.post("/create-order", async (req, res) => {
-  const { amount } = req.body;
-
-  const options = {
-    amount: amount * 100,
-    currency: "INR",
-    receipt: "receipt_" + Date.now(),
-  };
-
-  try {
-    const order = await razorpay.orders.create(options);
-    res.json(order);
-  } catch (err) {
-    res.status(500).json({ error: err });
-  }
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
 });
 
-app.listen(4000, () => {
-  console.log("Server running on port 4000");
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
 });
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+module.exports = app;
