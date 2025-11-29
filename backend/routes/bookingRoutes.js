@@ -10,5 +10,6 @@ router.get("/:id", authMiddleware.verifyToken, bookingController.getBookingById)
 
 // Admin routes (optional - for future use)
 router.get("/", authMiddleware.verifyToken, authMiddleware.requireAdmin, bookingController.getAllBookings);
+router.put("/:id/cancel", authMiddleware.verifyToken, bookingController.cancelBooking);
 
 module.exports = router;
