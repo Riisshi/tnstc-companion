@@ -73,7 +73,7 @@ export default function RefundTracker() {
 
           <p>
             <strong>Requested:</strong>{" "}
-            {new Date(r.requestedAt).toLocaleString()}
+            {new Date(r.createdAt).toLocaleString()}
           </p>
 
           {r.processedAt && (
